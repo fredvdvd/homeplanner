@@ -1,0 +1,5 @@
+.login{max-width:340px;margin:18vh auto 0;padding:24px;display:grid;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.login h1{font:700 26px/1 var(--head);margin:0 0 8px}
+.login label{color:var(--ink2);font-size:13px;font-weight:500}
+.login input{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:10px;width:100%}
+.login .err{color:var(--hi);min-height:1.3em;margin:0;font-size:13px}

@@ -1,0 +1,17 @@
+services:
+  planner:
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_PASSWORD: ${APP_PASSWORD:?Set APP_PASSWORD in .env (8+ characters)}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    # Bound to localhost by default. Put a reverse proxy with HTTPS in front,
+    # or set BIND_ADDR=0.0.0.0 in .env to expose it directly (plain HTTP).
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${PORT:-3000}:3000"
+    volumes:
+      - planner-data:/data
+
+volumes:
+  planner-data:

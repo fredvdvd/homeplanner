@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Day Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <h1>Day Planner</h1>
+    <span class="sub" id="sync"></span>
+    <div class="spacer"></div>
+    <button class="btn" id="themeBtn" aria-label="Toggle dark mode">Theme</button>
+    <button class="btn ghost" id="logoutBtn">Log out</button>
+    <button class="btn primary" id="newBtn">New task</button>
+  </div>
+
+  <div class="tabs" role="group" aria-label="View">
+    <button data-tab="board" aria-pressed="true">Board</button>
+    <button data-tab="day" aria-pressed="false">Day</button>
+  </div>
+
+  <div class="layout" id="layout" data-view="board">
+    <section class="boardwrap" aria-label="Task board">
+      <div class="board" id="board"></div>
+    </section>
+    <section class="day" aria-label="Day plan">
+      <div class="week">
+        <button class="btn ghost" id="prevW" aria-label="Previous week">&lsaquo;</button>
+        <div class="days" id="days"></div>
+        <button class="btn ghost" id="nextW" aria-label="Next week">&rsaquo;</button>
+      </div>
+      <div class="dayhead"><h2 id="dayTitle"></h2><span id="daySum"></span><div class="spacer"></div><button class="btn ghost" id="todayBtn">Today</button></div>
+      <div class="unsched" id="unsched"></div>
+      <div class="tl-wrap" id="tlWrap"><div class="tl" id="tl"></div></div>
+      <div class="hint">Drag a card or chip onto the timeline to time-block it. Click an empty slot to add a task at that time.</div>
+    </section>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <div class="dlg">
+    <h2 id="dlgTitle">Task</h2>
+    <label>Title<input id="fTitle" maxlength="140" autocomplete="off"></label>
+    <label>Notes<textarea id="fNotes"></textarea></label>
+    <div class="row2">
+      <label>Status<select id="fCol"></select></label>
+      <label>Priority<select id="fPrio"><option value="0">Normal</option><option value="1">Medium</option><option value="2">High</option></select></label>
+    </div>
+    <div class="row3">
+      <label>Date<input type="date" id="fDate"></label>
+      <label>Start<input type="time" id="fStart" step="900"></label>
+      <label>Length<select id="fDur"></select></label>
+    </div>
+    <div class="actions">
+      <button class="btn danger" id="fDel">Delete</button>
+      <div class="spacer"></div>
+      <button class="btn" id="fCancel">Cancel</button>
+      <button class="btn primary" id="fSave">Save task</button>
+    </div>
+  </div>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
