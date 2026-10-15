@@ -70,6 +70,24 @@
     ]};
   }
 
+  /* ---------- calendar events (read-only overlay) ---------- */
+  var evCache={},evPending={};
+  function events(date){
+    var c=evCache[date];
+    if(c&&Date.now()-c.at<60000)return c.list;
+    if(!evPending[date]){
+      evPending[date]=true;
+      fetch('/api/events?date='+date,{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).then(function(j){
+        evPending[date]=false;
+        if(!j)return;
+        var changed=!c||JSON.stringify(c.list)!==JSON.stringify(j.events);
+        evCache[date]={at:Date.now(),list:j.events};
+        if(changed&&date===selDate)renderDay();
+      }).catch(function(){evPending[date]=false});
+    }
+    return c?c.list:[];
+  }
+
   /* ---------- render ---------- */
   function render(){renderBoard();renderDay();}
 
@@ -114,8 +132,11 @@
     $('#daySum').textContent=open+' open'+(planned?' \u00b7 '+human(planned)+' blocked':'');
     $('#todayBtn').style.visibility=selDate===today?'hidden':'visible';
 
+    var evs=events(selDate);
     var u='';
-    if(uns.length){u='<div class="unsched-label">Not scheduled yet</div>';uns.forEach(function(t){u+='<button class="chip" draggable="true" data-id="'+t.id+'" title="Drag onto the timeline">'+esc(t.title)+'</button>'})}
+    var allDay=evs.filter(function(e){return e.allDay});
+    if(allDay.length){allDay.forEach(function(e){u+='<span class="chip ev" title="Calendar, all day">'+esc(e.title)+'</span>'})}
+    if(uns.length){u+='<div class="unsched-label">Not scheduled yet</div>';uns.forEach(function(t){u+='<button class="chip" draggable="true" data-id="'+t.id+'" title="Drag onto the timeline">'+esc(t.title)+'</button>'})}
     $('#unsched').innerHTML=u;
 
     var total=(H1-H0)*HH,tl='';
@@ -125,7 +146,9 @@
       if(h<H1)tl+='<div class="hr half" style="top:'+(y+HH/2)+'px"></div>';
     }
     // lanes for overlaps
-    var items=sched.map(function(t){return {t:t,s:t.start,e:t.start+(t.dur||60)}}).sort(function(a,b){return a.s-b.s});
+    var items=sched.map(function(t){return {t:t,s:t.start,e:t.start+(t.dur||60)}})
+      .concat(evs.filter(function(e){return !e.allDay}).map(function(e){return {ev:e,s:e.start,e:Math.max(e.end,e.start+15)}}))
+      .sort(function(a,b){return a.s-b.s});
     var lanes=[];
     items.forEach(function(it){
       var placed=false;
@@ -141,6 +164,10 @@
     items.forEach(function(it){
       var t=it.t,top=(it.s-H0*60)/60*HH,ht=Math.max(22,(it.e-it.s)/60*HH-2);
       var w=100/it.n;
+      if(it.ev){
+        tl+='<div class="evb" title="Calendar event" style="top:'+top+'px;height:'+ht+'px;left:calc('+(it.lane*w)+'% + 2px);width:calc('+w+'% - 4px)">'+esc(it.ev.title)+(ht>40?'<small>'+hm(it.s)+'\u2013'+hm(it.e)+'</small>':'')+'</div>';
+        return;
+      }
       tl+='<button class="blk p'+t.prio+(t.col==='done'?' done':'')+'" draggable="true" data-id="'+t.id+'" style="top:'+top+'px;height:'+ht+'px;left:calc('+(it.lane*w)+'% + 2px);width:calc('+w+'% - 4px)">'+esc(t.title)+(ht>40?'<small>'+hm(it.s)+'\u2013'+hm(it.e)+'</small>':'')+'</button>';
     });
     tl+='<div class="nowline" id="now" style="display:none"></div>';
@@ -155,6 +182,43 @@
     n.style.display='block';n.style.top=((m-H0*60)/60*HH)+'px';
   }
   setInterval(placeNow,60000);
+
+  /* ---------- calendar settings ---------- */
+  function postJson(url,body){return fetch(url,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}
+  function initCalendar(){
+    var tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){}
+    fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).then(function(me){
+      if(!me)return;
+      if(tz&&tz!==me.tz)postJson('/api/me/settings',{tz:tz});
+      if(!me.calendar.connected)toast('Calendar not connected \u2013 use Calendar \u2192 Reconnect');
+      else if(me.calendar.error)toast('Calendar sync: '+me.calendar.error);
+    }).catch(function(){});
+    $('#calCancel').onclick=function(){$('#calDlg').close()};
+    $('#calBtn').onclick=function(){
+      $('#calStatus').textContent='Loading\u2026';$('#calDlg').showModal();
+      Promise.all([
+        fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}),
+        fetch('/api/calendars',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():{calendars:[]}})
+      ]).then(function(a){
+        var me=a[0].calendar,cals=a[1].calendars;
+        $('#calStatus').textContent=me.connected?(me.error?'Last sync problem: '+me.error:'Connected. Tasks with a date and start time appear in your calendar; moving or finishing them updates it.'):'Not connected. Use Reconnect Google and allow calendar access.';
+        var target=me.target==='primary'?(cals.filter(function(c){return c.primary})[0]||{}).id||me.target:me.target;
+        $('#calTarget').innerHTML=cals.filter(function(c){return c.writable}).map(function(c){return '<option value="'+esc(c.id)+'"'+(c.id===target?' selected':'')+'>'+esc(c.name)+(c.primary?' (primary)':'')+'</option>'}).join('');
+        var show={};me.show.forEach(function(id){show[id]=1});
+        var prim=(cals.filter(function(c){return c.primary})[0]||{}).id;if(show.primary&&prim)show[prim]=1;
+        $('#calShow').innerHTML=cals.map(function(c){return '<label><input type="checkbox" value="'+esc(c.id)+'"'+(show[c.id]?' checked':'')+'>'+esc(c.name)+'</label>'}).join('');
+      }).catch(function(){$('#calStatus').textContent='Could not load calendars.'});
+    };
+    $('#calSave').onclick=function(){
+      var show=[].slice.call(document.querySelectorAll('#calShow input:checked')).map(function(i){return i.value});
+      var body={calShow:show};
+      if($('#calTarget').value)body.calTarget=$('#calTarget').value;
+      postJson('/api/me/settings',body).then(function(r){
+        if(!r.ok)throw 0;
+        evCache={};$('#calDlg').close();renderDay();toast('Calendar settings saved');
+      }).catch(function(){toast('Could not save')});
+    };
+  }
 
   /* ---------- actions ---------- */
   function toast(t){var e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('show')},1800)}
@@ -287,7 +351,7 @@
     });
     // click empty slot to add
     tl.addEventListener('click',function(e){
-      if(e.target.closest('.blk'))return;
+      if(e.target.closest('.blk,.evb'))return;
       var s=Math.max(H0*60,Math.min(minAt(e),(H1-1)*60));
       s=Math.floor(s/30)*30;
       openEdit(null,{date:selDate,start:s,col:'next'});
@@ -295,6 +359,7 @@
   }
 
   init();
+  initCalendar();
   $('#logoutBtn').onclick=function(){fetch('/api/logout',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'}).then(function(){location.reload()})};
   var cached=lsGet();
   state=cached&&Array.isArray(cached.tasks)?cached:{tasks:[]};

@@ -3,7 +3,11 @@ services:
     build: .
     restart: unless-stopped
     environment:
-      APP_PASSWORD: ${APP_PASSWORD:?Set APP_PASSWORD in .env (8+ characters)}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?Set GOOGLE_CLIENT_ID in .env}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?Set GOOGLE_CLIENT_SECRET in .env}
+      PUBLIC_URL: ${PUBLIC_URL:?Set PUBLIC_URL in .env}
+      ALLOWED_EMAILS: ${ALLOWED_EMAILS:?Set ALLOWED_EMAILS in .env}
+      SESSION_SECRET: ${SESSION_SECRET:-}
       TRUST_PROXY: ${TRUST_PROXY:-false}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
     # Bound to localhost by default. Put a reverse proxy with HTTPS in front,

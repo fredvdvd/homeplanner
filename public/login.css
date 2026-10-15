@@ -3,3 +3,4 @@
 .login label{color:var(--ink2);font-size:13px;font-weight:500}
 .login input{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:10px;width:100%}
 .login .err{color:var(--hi);min-height:1.3em;margin:0;font-size:13px}
+.login .btn{text-align:center;text-decoration:none;display:block}

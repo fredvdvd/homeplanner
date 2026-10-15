@@ -16,6 +16,7 @@
     <span class="sub" id="sync"></span>
     <div class="spacer"></div>
     <button class="btn" id="themeBtn" aria-label="Toggle dark mode">Theme</button>
+    <button class="btn" id="calBtn">Calendar</button>
     <button class="btn ghost" id="logoutBtn">Log out</button>
     <button class="btn primary" id="newBtn">New task</button>
   </div>
@@ -62,6 +63,20 @@
       <div class="spacer"></div>
       <button class="btn" id="fCancel">Cancel</button>
       <button class="btn primary" id="fSave">Save task</button>
+    </div>
+  </div>
+</dialog>
+<dialog id="calDlg">
+  <div class="dlg">
+    <h2>Google Calendar</h2>
+    <p class="hint" id="calStatus"></p>
+    <label>Add my timed tasks to<select id="calTarget"></select></label>
+    <fieldset class="calshow"><legend>Show events from</legend><div id="calShow"></div></fieldset>
+    <div class="actions">
+      <a class="btn" href="/auth/google" id="calReconnect">Reconnect Google</a>
+      <div class="spacer"></div>
+      <button class="btn" id="calCancel">Cancel</button>
+      <button class="btn primary" id="calSave">Save</button>
     </div>
   </div>
 </dialog>

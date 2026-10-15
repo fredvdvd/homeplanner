@@ -102,6 +102,11 @@ button{cursor:pointer}
 .blk.p2{border-left-color:var(--hi)} .blk.p1{border-left-color:var(--med)}
 .blk.done{opacity:.55;text-decoration:line-through}
 .blk small{display:block;opacity:.8;font-size:11.5px}
+.evb{position:absolute;border-radius:6px;background:var(--card);color:var(--ink2);border:1px dashed var(--ink2);border-left-width:4px;padding:3px 7px;overflow:hidden;font-size:13px;line-height:1.25;cursor:default}
+.evb small{display:block;opacity:.8;font-size:11.5px}
+.chip.ev{cursor:default;border-style:dashed;color:var(--ink2)}
+.calshow{border:1px solid var(--line);border-radius:8px;margin:0;padding:8px 10px}
+.calshow label{display:flex;gap:8px;align-items:center;padding:2px 0}
 .nowline{position:absolute;left:-6px;right:0;border-top:2px solid var(--now);pointer-events:none;z-index:3}
 .nowline::before{content:"";position:absolute;left:0;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--now)}
 .tl.over{background:var(--accent-soft)}
