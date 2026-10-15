@@ -268,6 +268,28 @@
     $('#fDur').innerHTML=DURS.map(function(d){return '<option value="'+d+'">'+human(d)+'</option>'}).join('');
 
     $('#newBtn').onclick=function(){openEdit(null,{date:selDate})};
+
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition,mic=$('#micBtn'),rec=null;
+    if(SR){
+      mic.hidden=false;
+      mic.onclick=function(){
+        if(rec){rec.stop();return}
+        rec=new SR();
+        rec.lang=navigator.language||'en-US';
+        rec.interimResults=false;
+        rec.onresult=function(e){
+          var text=e.results[0][0].transcript.trim().slice(0,140);
+          if(!text)return;
+          text=text.charAt(0).toUpperCase()+text.slice(1);
+          addTask(text,'backlog');toast('Added: '+text);
+        };
+        rec.onerror=function(e){toast(e.error==='not-allowed'||e.error==='service-not-allowed'?'Microphone access is blocked':e.error==='no-speech'?'Heard nothing':'Voice input failed')};
+        rec.onend=function(){rec=null;mic.classList.remove('rec');mic.setAttribute('aria-pressed','false')};
+        mic.classList.add('rec');mic.setAttribute('aria-pressed','true');
+        toast('Listening\u2026');
+        try{rec.start()}catch(err){rec=null;mic.classList.remove('rec')}
+      };
+    }
     $('#fSave').onclick=saveEdit;
     $('#fCancel').onclick=function(){$('#dlg').close()};
     $('#fDel').onclick=function(){if(editing){state.tasks=state.tasks.filter(function(t){return t!==editing});$('#dlg').close();changed();render();toast('Task deleted')}};
