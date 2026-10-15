@@ -127,7 +127,8 @@ dialog::backdrop{background:rgba(5,12,18,.55)}
 .toast.show{opacity:1}
 
 @media (max-width:960px){
-  .layout{grid-template-columns:1fr}
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .boardwrap{min-width:0}
   .tabs{display:flex}
   .layout[data-view="board"] .day{display:none}
   .layout[data-view="day"] .boardwrap{display:none}
