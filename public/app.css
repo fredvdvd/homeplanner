@@ -150,8 +150,8 @@ dialog::backdrop{background:rgba(5,12,18,.55)}
   .btn{min-height:40px;padding:8px 14px}
   #newBtn{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;min-height:48px;padding:0 20px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.28)}
   .tabs button{min-height:44px}
-  .board{grid-template-columns:repeat(4,82vw);scroll-snap-type:x mandatory;margin-inline:-12px;padding-inline:12px;scroll-padding-inline:12px}
-  .col{scroll-snap-align:start;min-height:200px}
+  .board{grid-template-columns:minmax(0,1fr);overflow-x:visible}
+  .col{min-height:0}
   .card{padding:12px}
   .add input,.dlg input,.dlg select,.dlg textarea{font-size:16px;min-height:44px}
   .day{padding:10px}
