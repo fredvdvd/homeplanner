@@ -29,8 +29,8 @@
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+html{-webkit-text-size-adjust:100%;height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{-webkit-tap-highlight-color:transparent;margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -133,5 +133,38 @@ dialog::backdrop{background:rgba(5,12,18,.55)}
   .layout[data-view="day"] .boardwrap{display:none}
   .day{position:static}
   .board{grid-template-columns:repeat(4,240px)}
+}
+.hint .touch{display:none}
+@media (hover:none){
+  .hint .mouse{display:none}
+  .hint .touch{display:inline}
+}
+
+@media (max-width:640px){
+  .app{padding:12px max(12px,env(safe-area-inset-right,0px)) 96px max(12px,env(safe-area-inset-left,0px))}
+  .top{gap:8px;margin-bottom:12px}
+  .top h1{font-size:22px}
+  .top .sub{font-size:13px}
+  .top .spacer{flex-basis:100%;height:0}
+  .btn{min-height:40px;padding:8px 14px}
+  #newBtn{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;min-height:48px;padding:0 20px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.28)}
+  .tabs button{min-height:44px}
+  .board{grid-template-columns:repeat(4,82vw);scroll-snap-type:x mandatory;margin-inline:-12px;padding-inline:12px;scroll-padding-inline:12px}
+  .col{scroll-snap-align:start;min-height:200px}
+  .card{padding:12px}
+  .add input,.dlg input,.dlg select,.dlg textarea{font-size:16px;min-height:44px}
+  .day{padding:10px}
+  .wd{padding:8px 0;min-height:52px}
+  .week .btn{padding:8px 10px}
+  .chip{padding:8px 12px;font-size:14px}
+  .tl-wrap{max-height:calc(100dvh - 300px);min-height:320px}
+  .blk,.evb{font-size:14px}
+  dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:16px 16px 0 0;max-height:92dvh;overflow-y:auto}
+  .dlg{padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+  .row3{grid-template-columns:1fr 1fr}
+  .row3 label:first-child{grid-column:1/-1}
+  .actions .btn{min-height:44px}
+  .toast{bottom:calc(78px + env(safe-area-inset-bottom,0px));max-width:90vw}
+  .login{margin-top:12vh;max-width:none;margin-inline:16px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
